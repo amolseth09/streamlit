@@ -1,16 +1,50 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+# Title and description
+st.title("Interactive Sales Dashboard")
+st.write("Upload a CSV file with sales and profit data to analyze and visualize results.")
 
-st.title("Welcome to My Streamlit App")
-st.write("This is a simple Streamlit application.")
-name = st.text_input("Enter your name:")
+# File uploader (only CSV allowed)
+uploaded_file = st.file_uploader("Upload your sales CSV", type=["csv"])
+if uploaded_file is not None:
+    # Read CSV into Pandas DataFrame
+    df = pd.read_csv(uploaded_file)
+    # Show a preview of the dataset
+    st.write("Data Preview:")
+    st.dataframe(df.head())
 
-if name:
-    st.write(f"Hello, {name}! Welcome to the app.")
+    # Dropdown for metric selection
+    metric = st.selectbox("Choose a metric:", ["sales", "profit"])
+    # Calculate total
+    total_value = df[metric].sum()
+    st.write(f"**Total {metric.capitalize()}:** {total_value}")
+    # Aggregate by region
+    agg_by_region = df.groupby("region")[metric].sum()
+    st.write(f"**{metric.capitalize()} by Region:**")
+    st.write(agg_by_region)
 
-# create a sample DataFrame
-data = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [25, 30, 35]
-})
-st.dataframe(data)
+    # Dropdown for chart type
+    chart_type = st.selectbox("Choose a chart type:", ["Bar", "Line", "Pie"])
+    fig, ax = plt.subplots()
+    if chart_type == "Bar":
+        agg_by_region.plot(kind="bar", ax=ax, color="skyblue", edgecolor="black")
+        ax.set_ylabel(metric.capitalize())
+        ax.set_title(f"{metric.capitalize()} by Region")
+    elif chart_type == "Line":
+        agg_by_region.plot(kind="line", marker="o", ax=ax, color="green")
+        ax.set_ylabel(metric.capitalize())
+        ax.set_title(f"{metric.capitalize()} by Region (Line Chart)")
+    elif chart_type == "Pie":
+        agg_by_region.plot(kind="pie", autopct="%1.1f%%", ax=ax)
+        ax.set_ylabel("")  # Hide Y-axis for pie chart
+        ax.set_title(f"{metric.capitalize()} Distribution by Region")
+    # Show chart in Streamlit
+    st.pyplot(fig)
+
+    # Prepare processed results
+    processed_df = agg_by_region.reset_index()
+    processed_df.columns = ["Region", metric.capitalize()]
+    # Download button
+    csv = processed_df.to_csv(index=False).encode("utf-8")
+    st.download_button(label="Download Processed Data as CSV",data=csv,file_name=f"{metric}_by_region.csv",mime="text/csv",)

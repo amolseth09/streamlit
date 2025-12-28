@@ -1,0 +1,17 @@
+region,sales,profit,units_sold,product
+North,10000,2000,100,Product A
+North,15000,3000,150,Product B
+South,8000,1600,80,Product C
+South,12000,2400,120,Product A
+East,9000,1800,90,Product B
+East,11000,2200,110,Product D
+West,13000,2600,130,Product C
+West,7000,1400,70,Product D
+North,9500,1900,95,Product D
+South,10500,2100,105,Product B
+East,8500,1700,85,Product A
+West,12500,2500,125,Product B
+North,14000,2800,140,Product C
+South,7500,1500,75,Product D
+East,11500,2300,115,Product C
+West,8800,1760,88,Product A
